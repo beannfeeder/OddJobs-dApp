@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 60% 11%;
+    --foreground: 210 20% 98%;
+
+    --card: 260 60% 9%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 260 60% 9%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 185 90% 63%;
+    --primary-foreground: 260 60% 11%;
+
+    --secondary: 260 40% 16%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 260 40% 16%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 185 90% 63%;
+    --accent-foreground: 260 60% 11%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 260 40% 16%;
+    --input: 260 40% 16%;
+    --ring: 185 90% 63%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  .cyan-border {
+    @apply border border-theme-cyan border-opacity-60 relative;
+  }
+
+  .cyan-glow {
+    @apply relative;
+  }
+
+  .cyan-glow::after {
+    content: "";
+    @apply absolute inset-0 rounded-lg opacity-30 blur-sm;
+    box-shadow: 0 0 15px theme("colors.theme.cyan");
+    z-index: -1;
+  }
+
+  .cyan-text {
+    @apply text-theme-cyan;
+    text-shadow: 0 0 10px rgba(77, 232, 245, 0.5);
+  }
+
+  .shimmer-effect {
+    background: linear-gradient(
+      90deg,
+      rgba(77, 232, 245, 0) 0%,
+      rgba(77, 232, 245, 0.1) 50%,
+      rgba(77, 232, 245, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
