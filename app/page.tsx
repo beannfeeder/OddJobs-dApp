@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import JobPreviewBackground from "@/components/job-preview-background"
 import ProfileButton from "@/components/profile-button"
@@ -41,8 +42,9 @@ export default function HomePage() {
           <Button
             variant="outline"
             className="flex-1 h-14 text-lg font-semibold cyan-border text-theme-cyan hover:bg-theme-dark-purple/50 transition-all duration-300"
+            asChild
           >
-            Log In
+            <Link href="/login">Log In</Link>
           </Button>
         </div>
       </main>
