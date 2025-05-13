@@ -1,2 +1,7 @@
 # OddJobs-dApp
 MegaHack 2025 beepbobbean
+
+OddJobs is a dApp that tackles these problems, by acting as a platform for posting and accepting part-time jobs, gigs or chores for both recruiters and users who are looking to earn some cash. OddJobs integrates the use of Web3 technologies such as Web3 wallet and also payment in crypto currencies. The purpose of OddJobs is to let the unemployed have a chance at working and earn some money for a living, and to let people earn some quick cash while on the hunt for professional jobs.
+
+The approach of OddJobs is slightly different from other job searching websites. A recruiter does not necessarily have to be a registered organization or company, and can be an individual. The job postings can range from day-to-day chores such as cleaning the house, washing cars to part-time gigs such as event crew or promoters for a grocery store. The recruiter will transfer the amount of the gig’s wage into the app in cryptocurrencies, to let the app safekeep the wage and confirm the authenticity of the job posting. After the job is posted, it is shown to the app’s users for a certain amount of time (24 hours) and the users of the app can apply for the job as they see fit. After the gig is done by a worker, the app transfers the wage that the recruiter offered into the worker’s account. If a job posting is unsuccessful, the job posting will be cancelled, and the wage will be returned to the recruiter’s account.
+
