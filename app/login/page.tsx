@@ -1,22 +1,28 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Wallet } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [walletAddress, setWalletAddress] = useState("")
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
+  // Simulate wallet detection on page load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setWalletAddress("0x71C7656EC7ab88b098defB751B7401B5f6d8976F")
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleLogin = () => {
     setIsLoading(true)
 
     // Simulate login delay
@@ -25,13 +31,14 @@ export default function LoginPage() {
     }, 1500)
   }
 
-  const handleQuickLogin = () => {
-    setIsLoading(true)
+  const handleConnectWallet = () => {
+    setIsConnecting(true)
 
-    // Simulate login delay
+    // Simulate wallet connection delay
     setTimeout(() => {
-      router.push("/dashboard")
-    }, 1500)
+      setWalletAddress("0x71C7656EC7ab88b098defB751B7401B5f6d8976F")
+      setIsConnecting(false)
+    }, 2000)
   }
 
   return (
@@ -43,74 +50,57 @@ export default function LoginPage() {
       </Link>
 
       <Card className="w-full max-w-md bg-theme-darkest-purple/80 backdrop-blur-md border-theme-cyan/30">
-        <CardHeader>
-          <CardTitle className="text-2xl text-white">Log in to OddJobs</CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Enter your credentials to access your account
-          </CardDescription>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl text-white">Welcome Back</CardTitle>
+          <CardDescription className="text-muted-foreground">Log in to access your OddJobs account</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                className="bg-theme-dark-purple/50 border-theme-cyan/30 text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                className="bg-theme-dark-purple/50 border-theme-cyan/30 text-white"
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-theme-cyan text-theme-black hover:bg-theme-cyan/90"
-              disabled={isLoading}
-            >
-              {isLoading ? "Logging in..." : "Log in"}
-            </Button>
-          </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-theme-cyan/20"></div>
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-theme-darkest-purple px-2 text-muted-foreground">Or continue with</span>
-            </div>
+        <CardContent className="flex flex-col items-center">
+          {/* User profile circle */}
+          <div className="w-24 h-24 rounded-full bg-theme-dark-purple border-4 border-theme-cyan flex items-center justify-center mb-6">
+            <span className="text-4xl font-bold text-theme-cyan">J</span>
           </div>
 
-          <div className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full cyan-border text-white hover:bg-theme-dark-purple/50"
-              onClick={handleQuickLogin}
-              disabled={isLoading}
-            >
-              Continue as Doe, J.
-            </Button>
+          {walletAddress ? (
+            <>
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-medium text-white mb-1">Doe, J.</h3>
+                <p className="text-sm text-muted-foreground break-all">
+                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                </p>
+              </div>
 
+              <Button
+                className="w-full bg-theme-cyan text-theme-black hover:bg-theme-cyan/90 mb-4"
+                onClick={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Continue as Doe, J."}
+              </Button>
+            </>
+          ) : (
             <Button
+              className="w-full cyan-border text-theme-cyan hover:bg-theme-dark-purple/50"
               variant="outline"
-              className="w-full cyan-border text-white hover:bg-theme-dark-purple/50"
-              disabled={isLoading}
+              onClick={handleConnectWallet}
+              disabled={isConnecting}
             >
-              <Wallet className="mr-2 h-4 w-4 text-theme-cyan" />
-              Connect Wallet
+              <Wallet className="mr-2 h-5 w-5" />
+              {isConnecting ? "Connecting Wallet..." : "Connect Wallet"}
             </Button>
-          </div>
+          )}
+
+          {walletAddress && (
+            <Button
+              variant="ghost"
+              className="text-sm text-muted-foreground hover:text-white"
+              onClick={() => setWalletAddress("")}
+            >
+              Use a different wallet
+            </Button>
+          )}
         </CardContent>
+
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-muted-foreground text-center w-full">
             Don&apos;t have an account?{" "}
