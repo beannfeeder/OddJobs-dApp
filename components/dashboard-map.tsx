@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { MapPin, X, Check } from "lucide-react"
+import { MapPin, X, Check, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 // Sample job data with more spread out coordinates and USDC values
@@ -123,15 +123,22 @@ export default function DashboardMap() {
   const [selectedJob, setSelectedJob] = useState<number | null>(null)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [availableJobs, setAvailableJobs] = useState([...initialJobLocations])
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Check local storage for taken jobs on component mount
   useEffect(() => {
+    loadAvailableJobs()
+  }, [])
+
+  const loadAvailableJobs = () => {
     const takenJobsStr = localStorage.getItem("takenJobs")
     if (takenJobsStr) {
       const takenJobIds = JSON.parse(takenJobsStr)
       setAvailableJobs(initialJobLocations.filter((job) => !takenJobIds.includes(job.id)))
+    } else {
+      setAvailableJobs([...initialJobLocations])
     }
-  }, [])
+  }
 
   const handlePinClick = (jobId: number) => {
     setSelectedJob(jobId)
@@ -173,6 +180,21 @@ export default function DashboardMap() {
     }, 2000)
   }
 
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    setSelectedJob(null)
+
+    // Clear taken jobs from local storage
+    localStorage.removeItem("takenJobs")
+
+    // Simulate a loading delay
+    setTimeout(() => {
+      // Reset available jobs to initial state
+      setAvailableJobs([...initialJobLocations])
+      setIsRefreshing(false)
+    }, 1000)
+  }
+
   // Find the selected job
   const selectedJobData = availableJobs.find((job) => job.id === selectedJob)
 
@@ -199,6 +221,20 @@ export default function DashboardMap() {
 
       {/* Subtle glow in the center */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-glow opacity-10"></div>
+
+      {/* Refresh button */}
+      <div className="absolute top-4 right-4 z-10">
+        <Button
+          onClick={handleRefresh}
+          variant="outline"
+          size="sm"
+          className="cyan-border bg-theme-darkest-purple/70 text-theme-cyan hover:bg-theme-dark-purple/50"
+          disabled={isRefreshing}
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+          {isRefreshing ? "Refreshing..." : "Refresh Jobs"}
+        </Button>
+      </div>
 
       {/* Map markers */}
       <div className="absolute inset-0">
@@ -276,9 +312,26 @@ export default function DashboardMap() {
         </div>
       )}
 
+      {/* Refreshing overlay */}
+      {isRefreshing && (
+        <div className="absolute inset-0 bg-theme-darkest-purple/50 backdrop-blur-sm flex items-center justify-center z-40">
+          <div className="flex flex-col items-center">
+            <RefreshCw size={40} className="text-theme-cyan animate-spin mb-4" />
+            <p className="text-white text-lg">Refreshing available jobs...</p>
+          </div>
+        </div>
+      )}
+
       {/* Map attribution - would be required for real maps */}
       <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-theme-darkest-purple/70 px-2 py-1 rounded">
         Map data © OddJobs 2025
+      </div>
+
+      {/* Job count */}
+      <div className="absolute bottom-4 left-4 bg-theme-dark-purple/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-theme-cyan/30">
+        <p className="text-white text-sm">
+          <span className="text-theme-cyan font-bold">{availableJobs.length}</span> jobs available in this area
+        </p>
       </div>
     </div>
   )

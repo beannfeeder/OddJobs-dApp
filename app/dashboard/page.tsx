@@ -66,13 +66,6 @@ export default function DashboardPage() {
               />
             </div>
           </div>
-
-          {/* Job count */}
-          <div className="absolute bottom-4 left-4 bg-theme-dark-purple/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-theme-cyan/30">
-            <p className="text-white text-sm">
-              <span className="text-theme-cyan font-bold">12</span> jobs available in this area
-            </p>
-          </div>
         </main>
       </div>
     </div>
