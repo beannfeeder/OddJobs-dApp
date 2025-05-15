@@ -1,29 +1,196 @@
 "use client"
 
-import { useState } from "react"
-import { MapPin } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { MapPin, X, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-// Sample job data
-const jobLocations = [
-  { id: 1, title: "Dog Walking", pay: "0.05 ETH", lat: 40.7128, lng: -74.006, color: "cyan" },
-  { id: 2, title: "Grocery Delivery", pay: "0.03 ETH", lat: 40.7148, lng: -74.013, color: "cyan" },
-  { id: 3, title: "Lawn Mowing", pay: "0.02 ETH", lat: 40.7158, lng: -73.998, color: "cyan" },
-  { id: 4, title: "House Cleaning", pay: "0.04 ETH", lat: 40.7118, lng: -74.009, color: "cyan" },
-  { id: 5, title: "Tutoring", pay: "0.06 ETH", lat: 40.7138, lng: -74.002, color: "cyan" },
-  { id: 6, title: "Food Delivery", pay: "0.025 ETH", lat: 40.7108, lng: -74.016, color: "cyan" },
-  { id: 7, title: "Furniture Assembly", pay: "0.07 ETH", lat: 40.7168, lng: -74.003, color: "cyan" },
-  { id: 8, title: "Car Wash", pay: "0.015 ETH", lat: 40.7098, lng: -74.011, color: "cyan" },
-  { id: 9, title: "Web Development", pay: "0.1 ETH", lat: 40.7178, lng: -74.008, color: "cyan" },
-  { id: 10, title: "Logo Design", pay: "0.08 ETH", lat: 40.7188, lng: -74.001, color: "cyan" },
-  { id: 11, title: "Content Writing", pay: "0.04 ETH", lat: 40.7208, lng: -74.005, color: "cyan" },
-  { id: 12, title: "Social Media", pay: "0.03 ETH", lat: 40.7218, lng: -74.014, color: "cyan" },
+// Sample job data with more spread out coordinates and USDC values
+const initialJobLocations = [
+  {
+    id: 1,
+    title: "Dog Walking",
+    pay: "25 USDC",
+    location: "Downtown",
+    description: "Walk two friendly golden retrievers for 30 minutes around the park.",
+    lat: 40.712,
+    lng: -74.006,
+  },
+  {
+    id: 2,
+    title: "Grocery Delivery",
+    pay: "15 USDC",
+    location: "Uptown",
+    description: "Deliver groceries from Whole Foods to an elderly couple.",
+    lat: 40.735,
+    lng: -73.99,
+  },
+  {
+    id: 3,
+    title: "Lawn Mowing",
+    pay: "35 USDC",
+    location: "Suburbs",
+    description: "Mow a small front lawn and trim hedges.",
+    lat: 40.702,
+    lng: -74.02,
+  },
+  {
+    id: 4,
+    title: "House Cleaning",
+    pay: "75 USDC",
+    location: "Midtown",
+    description: "Clean a 2-bedroom apartment including kitchen and bathroom.",
+    lat: 40.755,
+    lng: -73.97,
+  },
+  {
+    id: 5,
+    title: "Tutoring",
+    pay: "45 USDC",
+    location: "University Area",
+    description: "Help a high school student with calculus for 2 hours.",
+    lat: 40.73,
+    lng: -73.96,
+  },
+  {
+    id: 6,
+    title: "Food Delivery",
+    pay: "12 USDC",
+    location: "Financial District",
+    description: "Deliver lunch orders to an office building.",
+    lat: 40.708,
+    lng: -74.01,
+  },
+  {
+    id: 7,
+    title: "Furniture Assembly",
+    pay: "60 USDC",
+    location: "Brooklyn",
+    description: "Assemble a bookshelf and desk from IKEA.",
+    lat: 40.68,
+    lng: -73.95,
+  },
+  {
+    id: 8,
+    title: "Car Wash",
+    pay: "30 USDC",
+    location: "Queens",
+    description: "Wash and vacuum a sedan at owner's residence.",
+    lat: 40.75,
+    lng: -73.87,
+  },
+  {
+    id: 9,
+    title: "Web Development",
+    pay: "150 USDC",
+    location: "Remote",
+    description: "Fix CSS issues on a small business website.",
+    lat: 40.72,
+    lng: -73.98,
+  },
+  {
+    id: 10,
+    title: "Logo Design",
+    pay: "100 USDC",
+    location: "Remote",
+    description: "Design a logo for a new coffee shop.",
+    lat: 40.76,
+    lng: -74.03,
+  },
+  {
+    id: 11,
+    title: "Content Writing",
+    pay: "80 USDC",
+    location: "Remote",
+    description: "Write 5 blog posts about cryptocurrency.",
+    lat: 40.69,
+    lng: -73.99,
+  },
+  {
+    id: 12,
+    title: "Social Media",
+    pay: "50 USDC",
+    location: "Remote",
+    description: "Create and schedule social media posts for 1 week.",
+    lat: 40.74,
+    lng: -74.05,
+  },
 ]
 
 export default function DashboardMap() {
+  const router = useRouter()
   const [activeJob, setActiveJob] = useState<number | null>(null)
+  const [selectedJob, setSelectedJob] = useState<number | null>(null)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [availableJobs, setAvailableJobs] = useState([...initialJobLocations])
 
-  // In a real implementation, we would use a mapping library like Mapbox, Google Maps, or Leaflet
-  // For this mockup, we'll create a simple visual representation
+  // Check local storage for taken jobs on component mount
+  useEffect(() => {
+    const takenJobsStr = localStorage.getItem("takenJobs")
+    if (takenJobsStr) {
+      const takenJobIds = JSON.parse(takenJobsStr)
+      setAvailableJobs(initialJobLocations.filter((job) => !takenJobIds.includes(job.id)))
+    }
+  }, [])
+
+  const handlePinClick = (jobId: number) => {
+    setSelectedJob(jobId)
+  }
+
+  const closeJobDetails = () => {
+    setSelectedJob(null)
+  }
+
+  const handleApply = () => {
+    setShowConfirmation(true)
+
+    // Store the taken job in local storage
+    const takenJobsStr = localStorage.getItem("takenJobs")
+    const takenJobs = takenJobsStr ? JSON.parse(takenJobsStr) : []
+    takenJobs.push(selectedJob)
+    localStorage.setItem("takenJobs", JSON.stringify(takenJobs))
+
+    // Store the job details for the My Jobs page
+    const myJobsStr = localStorage.getItem("myJobs")
+    const myJobs = myJobsStr ? JSON.parse(myJobsStr) : []
+    const jobToAdd = initialJobLocations.find((job) => job.id === selectedJob)
+    if (jobToAdd) {
+      myJobs.push({
+        ...jobToAdd,
+        status: "in-progress",
+        appliedAt: new Date().toISOString(),
+      })
+      localStorage.setItem("myJobs", JSON.stringify(myJobs))
+    }
+
+    // Remove the job from available jobs
+    setAvailableJobs(availableJobs.filter((job) => job.id !== selectedJob))
+
+    setTimeout(() => {
+      setShowConfirmation(false)
+      setSelectedJob(null)
+      router.push("/dashboard/my-jobs")
+    }, 2000)
+  }
+
+  // Find the selected job
+  const selectedJobData = availableJobs.find((job) => job.id === selectedJob)
+
+  // Calculate map dimensions for better pin distribution
+  const mapWidth = 100
+  const mapHeight = 100
+
+  // Function to normalize coordinates to fit our map
+  const normalizeCoordinates = (lat: number, lng: number) => {
+    // These ranges should be adjusted based on your actual data
+    const latRange = [40.68, 40.76]
+    const lngRange = [-74.05, -73.87]
+
+    const normalizedLat = ((lat - latRange[0]) / (latRange[1] - latRange[0])) * mapHeight
+    const normalizedLng = ((lng - lngRange[0]) / (lngRange[1] - lngRange[0])) * mapWidth
+
+    return { x: normalizedLng, y: normalizedLat }
+  }
 
   return (
     <div className="h-full w-full bg-theme-deep-purple relative overflow-hidden">
@@ -35,36 +202,79 @@ export default function DashboardMap() {
 
       {/* Map markers */}
       <div className="absolute inset-0">
-        {jobLocations.map((job) => (
-          <div
-            key={job.id}
-            className="absolute"
-            style={{
-              left: `${(job.lng + 74.02) * 1000}%`,
-              top: `${(40.72 - job.lat) * 1000}%`,
-            }}
-            onMouseEnter={() => setActiveJob(job.id)}
-            onMouseLeave={() => setActiveJob(null)}
-          >
-            <div className="relative group cursor-pointer">
-              <MapPin
-                size={activeJob === job.id ? 32 : 24}
-                className={`text-theme-cyan ${activeJob === job.id ? "animate-pulse" : ""}`}
-              />
-
-              {/* Job info popup */}
+        {availableJobs.map((job) => {
+          const coords = normalizeCoordinates(job.lat, job.lng)
+          return (
+            <div
+              key={job.id}
+              className="absolute"
+              style={{
+                left: `${coords.x}%`,
+                top: `${coords.y}%`,
+              }}
+            >
               <div
-                className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-theme-darkest-purple/90 backdrop-blur-md p-3 rounded-lg border border-theme-cyan/30 shadow-lg transition-opacity duration-200 ${activeJob === job.id ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className="relative group cursor-pointer"
+                onMouseEnter={() => setActiveJob(job.id)}
+                onMouseLeave={() => setActiveJob(null)}
+                onClick={() => handlePinClick(job.id)}
               >
-                <h3 className="font-medium text-white">{job.title}</h3>
-                <p className="text-sm text-theme-cyan font-semibold">{job.pay}</p>
-                <div className="mt-1 text-xs text-muted-foreground">Click to view details</div>
-                <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-theme-darkest-purple border-r border-b border-theme-cyan/30"></div>
+                <MapPin
+                  size={activeJob === job.id || selectedJob === job.id ? 32 : 24}
+                  className={`text-theme-cyan ${activeJob === job.id || selectedJob === job.id ? "animate-pulse" : ""}`}
+                />
+
+                {/* Hover tooltip */}
+                {activeJob === job.id && selectedJob !== job.id && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-theme-darkest-purple/90 backdrop-blur-md p-2 rounded-lg border border-theme-cyan/30 shadow-lg z-10">
+                    <h3 className="font-medium text-white text-sm">{job.title}</h3>
+                    <p className="text-xs text-theme-cyan">{job.pay}</p>
+                    <div className="mt-1 text-xs text-muted-foreground">Click for details</div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {/* Job details popup */}
+      {selectedJob && selectedJobData && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] bg-theme-darkest-purple/95 backdrop-blur-md p-4 rounded-lg border border-theme-cyan/40 shadow-lg z-20">
+          <button onClick={closeJobDetails} className="absolute top-3 right-3 text-muted-foreground hover:text-white">
+            <X size={18} />
+          </button>
+
+          <h2 className="text-xl font-bold text-white mb-1">{selectedJobData.title}</h2>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-theme-cyan font-semibold">{selectedJobData.pay}</p>
+            <p className="text-sm text-muted-foreground">{selectedJobData.location}</p>
+          </div>
+
+          <div className="border-t border-theme-cyan/20 my-3 pt-3">
+            <h3 className="text-sm font-medium text-white mb-1">Job Description:</h3>
+            <p className="text-sm text-muted-foreground mb-4">{selectedJobData.description}</p>
+          </div>
+
+          <Button className="w-full bg-theme-cyan text-theme-black hover:bg-theme-cyan/90" onClick={handleApply}>
+            Apply for this Job
+          </Button>
+        </div>
+      )}
+
+      {/* Application confirmation */}
+      {showConfirmation && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] bg-theme-darkest-purple/95 backdrop-blur-md p-6 rounded-lg border border-theme-cyan/40 shadow-lg z-30 flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-theme-cyan/20 flex items-center justify-center mb-4">
+            <Check size={32} className="text-theme-cyan" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Job Secured!</h2>
+          <p className="text-sm text-muted-foreground text-center mb-2">
+            This job is now locked to your account. You'll be redirected to your jobs page.
+          </p>
+          <p className="text-theme-cyan text-sm">Transaction ID: 0x71C7...8976F</p>
+        </div>
+      )}
 
       {/* Map attribution - would be required for real maps */}
       <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-theme-darkest-purple/70 px-2 py-1 rounded">

@@ -1,12 +1,21 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Search, Plus, Briefcase, Clock, Wallet, Settings, HelpCircle } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 interface DashboardSidebarProps {
   open: boolean
 }
 
 export default function DashboardSidebar({ open }: DashboardSidebarProps) {
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    return pathname === path || pathname?.startsWith(path + "/")
+  }
+
   return (
     <aside
       className={`${
@@ -29,23 +38,41 @@ export default function DashboardSidebar({ open }: DashboardSidebarProps) {
 
         {/* Navigation */}
         <nav className="space-y-1 flex-1">
-          <Button variant="ghost" className="w-full justify-start text-white hover:bg-theme-dark-purple/50" asChild>
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/dashboard") && !isActive("/dashboard/my-jobs") && !isActive("/dashboard/wallet") ? "bg-theme-dark-purple/70 text-white" : "text-muted-foreground hover:bg-theme-dark-purple/50 hover:text-white"}`}
+            asChild
+          >
             <Link href="/dashboard">
-              <Briefcase className="mr-2 h-5 w-5 text-theme-cyan" />
+              <Briefcase
+                className={`mr-2 h-5 w-5 ${isActive("/dashboard") && !isActive("/dashboard/my-jobs") && !isActive("/dashboard/wallet") ? "text-theme-cyan" : "text-muted-foreground"}`}
+              />
               Available Jobs
             </Link>
           </Button>
 
-          <Button variant="ghost" className="w-full justify-start text-white hover:bg-theme-dark-purple/50" asChild>
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/dashboard/my-jobs") ? "bg-theme-dark-purple/70 text-white" : "text-muted-foreground hover:bg-theme-dark-purple/50 hover:text-white"}`}
+            asChild
+          >
             <Link href="/dashboard/my-jobs">
-              <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
+              <Clock
+                className={`mr-2 h-5 w-5 ${isActive("/dashboard/my-jobs") ? "text-theme-cyan" : "text-muted-foreground"}`}
+              />
               My Jobs
             </Link>
           </Button>
 
-          <Button variant="ghost" className="w-full justify-start text-white hover:bg-theme-dark-purple/50" asChild>
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/dashboard/wallet") ? "bg-theme-dark-purple/70 text-white" : "text-muted-foreground hover:bg-theme-dark-purple/50 hover:text-white"}`}
+            asChild
+          >
             <Link href="/dashboard/wallet">
-              <Wallet className="mr-2 h-5 w-5 text-muted-foreground" />
+              <Wallet
+                className={`mr-2 h-5 w-5 ${isActive("/dashboard/wallet") ? "text-theme-cyan" : "text-muted-foreground"}`}
+              />
               Wallet
             </Link>
           </Button>
@@ -53,14 +80,22 @@ export default function DashboardSidebar({ open }: DashboardSidebarProps) {
 
         {/* Footer navigation */}
         <div className="space-y-1 pt-4 border-t border-theme-cyan/20">
-          <Button variant="ghost" className="w-full justify-start text-white hover:bg-theme-dark-purple/50" asChild>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground hover:bg-theme-dark-purple/50 hover:text-white"
+            asChild
+          >
             <Link href="/dashboard/settings">
               <Settings className="mr-2 h-5 w-5 text-muted-foreground" />
               Settings
             </Link>
           </Button>
 
-          <Button variant="ghost" className="w-full justify-start text-white hover:bg-theme-dark-purple/50" asChild>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground hover:bg-theme-dark-purple/50 hover:text-white"
+            asChild
+          >
             <Link href="/dashboard/help">
               <HelpCircle className="mr-2 h-5 w-5 text-muted-foreground" />
               Help & Support
